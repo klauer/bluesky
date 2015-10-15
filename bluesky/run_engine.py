@@ -652,6 +652,12 @@ class RunEngine:
             raise err
         finally:
             self.state = 'idle'
+            # call stop() on every movable object we ever set() or kickoff()
+            for obj in self._movable_objs_touched:
+                try:
+                    obj.stop()
+                except Exception:
+                    logger.error("Failed to stop %r", obj)
             # in case we were interrupted between 'configure' and 'deconfigure'
             for obj in list(self._configured):
                 try:
@@ -659,12 +665,6 @@ class RunEngine:
                 except Exception:
                     logger.error("Failed to deconfigure %r", obj)
                 self._configured.remove(obj)
-            # call stop() on every movable object we ever set() or kickoff()
-            for obj in self._movable_objs_touched:
-                try:
-                    obj.stop()
-                except Exception:
-                    logger.error("Failed to stop %r", obj)
             # Try to collect any flyers that were kicked off but not finished.
             # Some might not support partial collection. We swallow errors.
             for obj in list(self._uncollected):
