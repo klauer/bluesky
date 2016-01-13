@@ -19,7 +19,8 @@ class Base:
                 for k in self._fields}
 
     def __repr__(self):
-        return '{}: {}'.format(self._klass, self._name)
+        return '{}(name={!r}, fields={!r})'.format(self._klass, self._name,
+                                                   self._fields)
 
     @property
     def state(self):

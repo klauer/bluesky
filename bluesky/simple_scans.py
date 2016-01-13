@@ -112,7 +112,8 @@ class _BundledScan:
         self.configuration = {}
         self.flyers = []
 
-    def __call__(self, *args, subs=None, sub_factories=None, **kwargs):
+    def __call__(self, *args, subs=None, sub_factories=None, time=None,
+                 **kwargs):
         scan_kwargs = dict()
         # Any kwargs valid for the scan go to the scan, not the RE.
         for k, v in kwargs.copy().items():
@@ -141,7 +142,7 @@ class _BundledScan:
 
         # Any remainging kwargs go the RE. To be safe, no args are passed
         # to RE; RE args effectively become keyword-only arguments.
-        return gs.RE(self.scan, _subs, **kwargs)
+        return gs.RE(self.scan, _subs, exposure_time=time, **kwargs)
 
 
 def _update_lists(out, inp):
@@ -195,7 +196,7 @@ class _OuterProductScan(_BundledScan):
             # never snake; SPEC doesn't know how
             if i != 0:
                 args.insert(4*(i + 1), False)
-        result = super().__call__(*args, subs=subs, **kwargs)
+        result = super().__call__(*args, subs=subs, time=time, **kwargs)
         _unset_acquire_time(original_times)
         return result
 
@@ -228,7 +229,7 @@ class _StepScan(_BundledScan):
                  subs=None, **kwargs):
         original_times = _set_acquire_time(time)
         result = super().__call__(motor, start, finish, intervals + 1,
-                                  subs=subs, **kwargs)
+                                  subs=subs, time=time, **kwargs)
         _unset_acquire_time(original_times)
         return result
 
