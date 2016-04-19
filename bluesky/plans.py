@@ -72,6 +72,10 @@ def plan_mutator(plan, msg_proc):
     plan_stack.append(plan)
     result_stack.append(None)
 
+    def get_msg_id(msg):
+        # return (msg.command, id(msg))
+        return tuple(id(m) for m in msg)
+
     while True:
         try:
             # get last result
@@ -83,8 +87,8 @@ def plan_mutator(plan, msg_proc):
             # if inserting / mutating, put new generator on the stack
             # and replace the current msg with the first element from the
             # new generator
-            if id(msg) not in msgs_seen:
-                msgs_seen.add(id(msg))
+            if get_msg_id(msg) not in msgs_seen:
+                msgs_seen.add(get_msg_id(msg))
 
                 new_gen, tail_gen = msg_proc(msg)
                 # mild correctness check
@@ -1094,7 +1098,7 @@ def one_nd_step(detectors, step, pos_cache):
         mapping motors to their last-set positions
     """
     def move():
-        yield Msg('checkpoint')
+        # yield Msg('checkpoint')
         for motor, pos in step.items():
             grp = _short_uid('set')
             if pos == pos_cache[motor]:
@@ -1107,6 +1111,7 @@ def one_nd_step(detectors, step, pos_cache):
     motors = step.keys()
     plan_stack = deque()
     with event_context(plan_stack):
+        plan_stack.append(move())
         plan_stack.append(trigger_and_read(list(detectors) + list(motors)))
     return plan_stack
 
