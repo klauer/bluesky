@@ -966,7 +966,7 @@ def relative_set(plan, devices=None):
                 # this plan may be being list-ified
                 cur_pos = 0
             else:
-                k = reading.keys()[0]
+                k = list(reading.keys())[0]
                 cur_pos = reading[k]['value']
         initial_positions[obj] = cur_pos
 
@@ -1020,7 +1020,7 @@ def reset_positions(plan, devices=None):
                 # this plan may be being list-ified
                 cur_pos = 0
             else:
-                k = reading.keys()[0]
+                k = list(reading.keys())[0]
                 cur_pos = reading[k]['value']
         initial_positions[obj] = cur_pos
 
@@ -1922,7 +1922,7 @@ def tweak(detector, target_field, motor, step, *, md=None):
                 pos = motor.position
             except AttributeError:
                 ret_mot = yield Msg('read', motor)
-                key = ret_mot.keys()[0]
+                key = list(ret_mot.keys())[0]
                 pos = ret_mot[key]['value']
             yield Msg('trigger', d, group='A')
             yield Msg('wait', None, 'A')
